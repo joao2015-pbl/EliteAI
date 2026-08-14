@@ -31,7 +31,7 @@ EliteAI é um chatbot/assistente construído em Python usando Flask, com templat
 
 Avisos de segurança importantes
 - Há chaves de API presentes no código como exemplos. NÃO deixe chaves reais em repositórios públicos. Revogue qualquer chave que já tenha sido comprometida.
-- O arquivo `app.py` contém um texto de "PERSONALIDADE" com instruções que podem ser perigosas ou antiéticas. Revise e restrinja conforme necessário para conformidade com leis e políticas.
+- O arquivo `app.py` contém um texto de "PERSONALIDADE" edite o como quiser por sua conta e risco.
 - Nunca compartilhe tokens ou credenciais em commits públicos.
 
 O que existe no repositório
@@ -70,3 +70,9 @@ Pré-requisitos
 ```bash
 git clone https://github.com/joao2015-pbl/EliteAI.git
 cd EliteAI
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 app.py
+
+\\APÓS A EXECUÇÃO DESSES COMANDOS,O FLASK INICIARÁ O SERVIDOR E ENVIARÁ DOIS LINKS,QUE SÃO DA IA.//
