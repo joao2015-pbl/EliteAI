@@ -66,7 +66,7 @@ Pré-requisitos
 - Heroku CLI (se for usar Heroku)
 - Para Buildozer: Linux (ou WSL), SDK/NDK Android, Buildozer instalado
 
-1) Preparar (comum)
+#Como Instalar:
 ```bash
 git clone https://github.com/joao2015-pbl/EliteAI.git
 cd EliteAI
