@@ -1,92 +1,131 @@
 # EliteAI
 
-Uma IA brasileira desenvolvida por João — "a IA Brasileira Feita por Mim, beloved by joão'xspam".
+EliteAI — uma IA brasileira desenvolvida por João (joao2015-pbl).
 
-## Sobre
+Descrição
+---------
+EliteAI é uma aplicação web em Python (Flask) com interface em HTML que serve como front-end para um agente conversacional. O repositório contém código do servidor (`app.py`), templates HTML em `templates/`, um arquivo de memória (`memoria.json`), e configurações úteis como `requirements.txt`, `Procfile` e `buildozer.spec`.
 
-EliteAI é um projeto pessoal que combina código em Python com páginas HTML para oferecer uma interface web para uma aplicação de inteligência artificial. Este README é uma base; ajuste os nomes de arquivos e comandos conforme a estrutura real do projeto.
+Aviso de segurança
+------------------
+Há chaves de API comprometidas no código (`app.py`) como exemplos — NÃO deixe chaves reais no repositório público. Use variáveis de ambiente para configurar credenciais (explico abaixo). Se já houver chaves sensíveis aqui, substitua-as e gere novas chaves nos serviços respectivos.
 
-Linguagens principais (composição aproximada no repositório):
-- HTML: 55%
-- Python: 44.9%
-- Procfile: 0.1%
+O que já existe neste repositório (principais arquivos)
+- app.py — servidor Flask / lógica do bot (ponto de entrada)
+- requirements.txt — dependências: Flask, requests, gunicorn
+- Procfile — comando para deploy em PaaS (Heroku)
+- templates/ — pasta com arquivos HTML (ex.: `index.html` usado por `app.py`)
+- memoria.py / memoria.json — utilitários / dados de memória
+- buildozer.spec — configuração para empacotamento Android (opcional)
+- LICENSE — arquivo de licença
 
-## Estrutura sugerida do repositório
+Variáveis de ambiente importantes
+- GROQ_API_KEY — chave para a API do provedor de LLM utilizado por `app.py` (recomendado configurar)
+- NEWS_API_KEY — chave da NewsAPI (se usar pesquisas de notícias)
+- WEATHER_API_KEY — chave para OpenWeatherMap
+- PORT — porta de execução (opcional)
 
-- templates/ ou web/ — arquivos HTML para a interface
-- app/ ou src/ — código Python da IA e backend
-- requirements.txt — dependências Python (se existir)
-- Procfile — configuração para deploy (ex.: Heroku)
+Instalação e execução (várias formas)
+-----------------------------------
+Abaixo estão instruções “reais” cobrindo desenvolvimento local, produção com Gunicorn, deploy via Heroku, execução com Docker e empacotamento Android com Buildozer.
 
-> Observação: adapte os caminhos acima conforme sua organização real de pastas.
+1) Preparar (comum a quase todos os métodos)
+- Clone o repositório:
+  git clone https://github.com/joao2015-pbl/EliteAI.git
+  cd EliteAI
+- Abra o arquivo `app.py` e verifique se o ponto de entrada e portas estão conforme deseja.
 
-## Instalação (local)
+2) Instalação rápida com Python + virtualenv (modo desenvolvedor)
+- Recomendado para desenvolvimento local.
 
-1. Clone o repositório:
+Linux/macOS:
+- python3 -m venv venv
+- source venv/bin/activate
+- pip install --upgrade pip
+- pip install -r requirements.txt
 
-   git clone https://github.com/joao2015-pbl/EliteAI.git
-   cd EliteAI
+Windows (PowerShell):
+- python -m venv venv
+- venv\Scripts\Activate.ps1
+- python -m pip install --upgrade pip
+- pip install -r requirements.txt
 
-2. Crie e ative um ambiente virtual (opcional, recomendado):
+Configurar variáveis de ambiente (exemplo Linux/macOS):
+- export GROQ_API_KEY="sua_chave"
+- export NEWS_API_KEY="sua_chave"
+- export WEATHER_API_KEY="sua_chave"
 
-   python -m venv venv
-   source venv/bin/activate  # macOS/Linux
-   venv\Scripts\activate     # Windows
+Executar em modo desenvolvimento:
+- python app.py
+- Acesse: http://localhost:5002 (o `app.py` por padrão roda em 0.0.0.0:5002)
 
-3. Instale dependências (se houver requirements.txt):
+3) Executar em produção com Gunicorn
+- Instale as dependências (depois de ativar venv): pip install -r requirements.txt
+- Execute:
+  gunicorn -w 4 -b 0.0.0.0:8000 app:app
+- Usar um proxy reverso (Nginx) é recomendado em produção.
 
-   pip install -r requirements.txt
+4) Usar Docker (recomendado para portabilidade)
+- Crie um arquivo `Dockerfile` (exemplo):
 
-## Como executar (exemplo genérico)
+  FROM python:3.11-slim
+  WORKDIR /app
+  COPY requirements.txt /app/
+  RUN pip install --no-cache-dir -r requirements.txt
+  COPY . /app
+  ENV PORT=5002
+  EXPOSE 5002
+  CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5002", "app:app"]
 
-- Se houver um arquivo principal como `app.py` ou `main.py`, rode:
+- Build e run:
+  docker build -t eliteai:latest .
+  docker run -e GROQ_API_KEY="sua_chave" -p 5002:5002 eliteai:latest
 
-  python app.py
+5) Deploy no Heroku (usando Procfile já presente)
+- Requisitos: ter Heroku CLI instalado e estar logado (heroku login)
+- Passos mínimos:
+  heroku create nome-do-app
+  git push heroku main
+  heroku config:set GROQ_API_KEY="sua_chave" NEWS_API_KEY="sua_chave" WEATHER_API_KEY="sua_chave"
+  heroku ps:scale web=1
+- O `Procfile` do repositório indica o comando de start; ajuste conforme seu entrypoint (ex.: `web: gunicorn app:app`).
 
-- Se o projeto usar Flask:
+6) Empacotar para Android usando Buildozer (opcional — há `buildozer.spec`)
+- Requisitos: Linux (ou WSL) + Buildozer + SDK/NDK do Android.
+- Instalar buildozer e dependências (exemplo Debian/Ubuntu):
+  sudo apt update && sudo apt install -y python3-pip python3-venv build-essential
+  python3 -m pip install --user buildozer
+  # instalar dependências do Android (SDK/NDK) conforme documentação Buildozer
 
-  export FLASK_APP=app.py
-  export FLASK_ENV=development
-  flask run
+- Preparar e gerar apk:
+  buildozer android debug
 
-- Se usar Gunicorn (produção):
+Consulte a documentação oficial do Buildozer para passos completos — este processo exige configuração adicional.
 
-  gunicorn app:app
+Configurações e pontos importantes do `app.py`
+- O app consulta várias APIs externas (Groq, NewsAPI, OpenWeather, CoinGecko, DuckDuckGo, Reddit, NASA). Certifique-se de definir as chaves necessárias como variáveis de ambiente.
+- `memoria.json` é usado para armazenar o histórico local; não é obrigatório, mas ajuda a manter contexto entre reinícios.
+- Ajuste `PERSONALIDADE` em `app.py` com cuidado — atualmente contém instruções muito permissivas. Considere revisar restrições de segurança e conformidade.
 
-Ajuste os comandos acima conforme o ponto de entrada real do seu projeto.
+Boas práticas
+- Nunca commit chaves em texto puro. Use `.env` local (e adicione `.env` ao .gitignore) ou serviços de secrets do provedor de nuvem.
+- Adicione um `Procfile` correto para o provedor de PaaS que usar.
+- Use um arquivo `.gitignore` para excluir `venv/`, `memoria.json` e outros artefatos locais.
 
-## Deploy
+Como contribuir
+- Abra issues para bugs/enhancements.
+- Fork → branch de feature → Pull Request com descrição clara.
 
-- Procfile: este arquivo indica à plataforma de PaaS como iniciar a aplicação (por exemplo Heroku). Um Procfile comum para apps Flask com Gunicorn:
+Testes
+- Não há testes automatizados no repositório atualmente. Recomenda-se adicionar `pytest` e fornecer comandos em `requirements-dev.txt`.
 
-  web: gunicorn app:app
+Licença
+- Há um arquivo LICENSE no repositório — verifique qual licença está aplicada e mantenha conforme necessário.
 
-- Para deploy no Heroku (exemplo básico):
-  1. heroku create
-  2. git push heroku main  # ou master, conforme branch padrão
-  3. heroku ps:scale web=1
+Dúvidas ou mais ajustes
+- Posso atualizar o README com exemplos de `Dockerfile`, `Procfile` e `.gitignore` no repositório se quiser.
+- Posso também remover chaves sensíveis do código e sugerir um `.env.example` com variáveis necessárias.
 
-## Testes
+---
 
-Descreva aqui como executar testes, se houver (por exemplo `pytest` ou scripts específicos).
-
-## Contribuições
-
-Contribuições são bem-vindas. Sugestão de fluxo:
-1. Fork do repositório
-2. Crie uma branch: `git checkout -b minha-feature`
-3. Faça commits claros e envie um Pull Request
-
-## Licença
-
-Adicione a licença do projeto (por exemplo MIT) ou deixe explícito que é código pessoal.
-
-## Contato
-
-- Autor: João (joao2015-pbl)
-- Repositório: https://github.com/joao2015-pbl/EliteAI
-
-
-Se quiser, posso:
-- Ajustar o README para incluir instruções específicas (ex.: pontos de entrada, dependências exatas, exemplos de uso) se você me indicar os arquivos principais (`app.py`, `requirements.txt`, framework, etc.).
-- Traduzir para outro estilo/adição de badges e exemplos de endpoints.
+Se quiser, eu já atualizo o README.md com este conteúdo no repositório agora. Confirma para eu commitar?
