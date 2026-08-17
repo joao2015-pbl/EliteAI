@@ -1,3 +1,4 @@
+<img src="Screenshot_2026-08-16_22_37_12.png" alt="EliteAI">. 
 # EliteAI
 
 EliteAI — uma IA brasileira desenvolvida por João (joao2015-pbl).  
